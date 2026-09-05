@@ -1,6 +1,6 @@
-# hey, i'm srijan 👋
+# hello
 
-I build things for rockets. Mostly C++, TypeScript, sensors, and flight software.
+I build things for rockets
 
 - [Airbrakes V3](https://github.com/SrijanCherupally/Airbrakes-V3)
 - [rocketPredictor](https://github.com/SrijanCherupally/rocketPredictor)
