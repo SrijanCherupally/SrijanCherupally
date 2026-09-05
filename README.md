@@ -14,12 +14,10 @@ Right now, I’m focused on TARC projects, especially flight software, altitude 
 
 C++ · TypeScript · Embedded systems · Sensors · GitHub
 
-## GitHub stats
+## GitHub activity
 
-<p align="center">
-  <img src="https://github-readme-stats.vercel.app/api?username=SrijanCherupally&show_icons=true&hide_border=true&rank_icon=github" alt="Srijan's GitHub stats" />
-  <br />
-  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=SrijanCherupally&layout=compact&hide_border=true" alt="Top languages" />
-</p>
+- [Contribution graph and recent activity](https://github.com/SrijanCherupally)
+- [Public repositories](https://github.com/SrijanCherupally?tab=repositories)
+- [Starred projects](https://github.com/SrijanCherupally?tab=stars)
 
 Thanks for stopping by.
