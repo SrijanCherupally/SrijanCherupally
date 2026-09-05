@@ -1,7 +1,3 @@
-# Hi, I'm Srijan 🚀
-
-I build things for rockets.
-
 - [Airbrakes V3](https://github.com/SrijanCherupally/Airbrakes-V3)
 - [rocketPredictor](https://github.com/SrijanCherupally/rocketPredictor)
 
