@@ -144,20 +144,24 @@ export function buildSVG(calendar) {
     )
     .join("\n    ");
 
-  // Large rocket
-  const rocketScale = 3;
-  const flightPath = `M ${startX.toFixed(1)} ${centerY.toFixed(1)} C ${(width * .28).toFixed(1)} ${(centerY - 18).toFixed(1)}, ${(width * .66).toFixed(1)} ${(centerY + 14).toFixed(1)}, ${endX.toFixed(1)} ${centerY.toFixed(1)}`;
+  // A deliberate S-curve makes the rocket visibly weave through the grid.
+  const wave = Math.min(31, Math.round(height * 0.26));
+  const p1 = startX + (endX - startX) * 0.29;
+  const p2 = startX + (endX - startX) * 0.55;
+  const p3 = startX + (endX - startX) * 0.79;
+  const flightPath = `M ${startX.toFixed(1)} ${centerY.toFixed(1)} C ${(startX + 64).toFixed(1)} ${(centerY - wave).toFixed(1)}, ${(p1 - 44).toFixed(1)} ${(centerY - wave).toFixed(1)}, ${p1.toFixed(1)} ${centerY.toFixed(1)} S ${(p2 - 36).toFixed(1)} ${(centerY + wave).toFixed(1)}, ${p2.toFixed(1)} ${centerY.toFixed(1)} S ${(p3 - 36).toFixed(1)} ${(centerY - wave).toFixed(1)}, ${p3.toFixed(1)} ${centerY.toFixed(1)} S ${(endX - 42).toFixed(1)} ${(centerY + wave).toFixed(1)}, ${endX.toFixed(1)} ${centerY.toFixed(1)}`;
 
-  // Smoke trail - heavy particles that fade out
-  const smokeTrail = Array.from({ length: 38 }, (_, i) => {
-    const delay = (i * 0.05).toFixed(2);
-    const offsetX = Math.random() * 20 - 10;
-    const offsetY = Math.random() * 30 - 15;
-    const size = Math.random() * 6 + 4;
-    return `<circle cx="${startX}" cy="${centerY + offsetY}" r="${size.toFixed(1)}" fill="#94a3b8">
-      <animate attributeName="cx" values="${startX};${endX + offsetX};${endX + offsetX}" keyTimes="0;.286;1" dur="${cycleDuration}s" begin="${delay}s" repeatCount="indefinite"/>
-      <animate attributeName="opacity" values=".42;.35;0;0" keyTimes="0;.286;.57;1" dur="${cycleDuration}s" begin="${delay}s" repeatCount="indefinite"/>
-      <animate attributeName="r" values="${size.toFixed(1)};${(size * 2.8).toFixed(1)};${(size * 2.8).toFixed(1)}" keyTimes="0;.57;1" dur="${cycleDuration}s" begin="${delay}s" repeatCount="indefinite"/>
+  // Delayed particles follow the same curve, so the exhaust also weaves.
+  // They fade by 3.4s, well before the rocket comes back at 7s.
+  const smokeTrail = Array.from({ length: 30 }, (_, i) => {
+    const delay = (i * 0.045).toFixed(3);
+    const size = 3.5 + ((i * 17) % 9) / 2;
+    const drift = i % 2 ? 1 : -1;
+    return `<circle cx="${startX}" cy="${centerY}" r="${size.toFixed(1)}" fill="#b8c4d2">
+      <animateMotion path="${flightPath}" keyPoints="0;1;1" keyTimes="0;.286;1" dur="${cycleDuration}s" begin="${delay}s" repeatCount="indefinite"/>
+      <animateTransform attributeName="transform" type="translate" values="0 0;${(drift * (8 + i % 5)).toFixed(1)} ${(drift * (5 + i % 7)).toFixed(1)};${(drift * (12 + i % 5)).toFixed(1)} ${(drift * (9 + i % 7)).toFixed(1)}" keyTimes="0;.43;1" dur="${cycleDuration}s" begin="${delay}s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;.52;.28;0;0" keyTimes="0;.08;.31;.48;1" dur="${cycleDuration}s" begin="${delay}s" repeatCount="indefinite"/>
+      <animate attributeName="r" values="${size.toFixed(1)};${(size * 1.5).toFixed(1)};${(size * 2.6).toFixed(1)}" keyTimes="0;.31;1" dur="${cycleDuration}s" begin="${delay}s" repeatCount="indefinite"/>
     </circle>`;
   }).join("\n    ");
 
@@ -172,6 +176,9 @@ export function buildSVG(calendar) {
       <feGaussianBlur in="SourceGraphic" stdDeviation="2.5"/>
       <feColorMatrix type="saturate" values="1.5"/>
     </filter>
+    <filter id="pathGlow" x="-10%" y="-30%" width="120%" height="160%">
+      <feGaussianBlur stdDeviation="1.3"/>
+    </filter>
   </defs>
 
   <rect x="0" y="0" width="${width}" height="${height}" fill="transparent"/>
@@ -184,9 +191,9 @@ export function buildSVG(calendar) {
     ${daySquares}
   </g>
 
-  <path d="${flightPath}" fill="none" stroke="#fb923c" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="7 9" opacity=".62">
-    <animate attributeName="stroke-dashoffset" from="0" to="-96" dur="1.2s" repeatCount="indefinite"/>
-    <animate attributeName="opacity" values=".18;.78;.18" dur="${cycleDuration}s" repeatCount="indefinite"/>
+  <path d="${flightPath}" fill="none" stroke="#ff7a18" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="10 10" opacity=".7" filter="url(#pathGlow)">
+    <animate attributeName="stroke-dashoffset" from="0" to="-120" dur="1s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values=".12;.82;.12" keyTimes="0;.286;.48" dur="${cycleDuration}s" repeatCount="indefinite"/>
   </path>
 
   <g id="smokeTrail" opacity="0.7">
@@ -194,18 +201,12 @@ export function buildSVG(calendar) {
   </g>
 
   <g id="rocket" filter="url(#glow)">
-    <!-- Scaled up rocket: 2x bigger -->
-    <ellipse cx="${(-22 * rocketScale).toFixed(1)}" cy="0" rx="${(12 * rocketScale).toFixed(1)}" ry="${(6 * rocketScale).toFixed(1)}" fill="url(#flame)">
-      <animate attributeName="rx" values="${(8 * rocketScale).toFixed(1)};${(14 * rocketScale).toFixed(1)};${(8 * rocketScale).toFixed(1)}" dur="0.15s" repeatCount="indefinite"/>
+    <ellipse cx="-91" cy="0" rx="32" ry="12" fill="url(#flame)" opacity=".9">
+      <animate attributeName="rx" values="26;41;29;36;26" dur=".18s" repeatCount="indefinite"/>
+      <animate attributeName="ry" values="9;16;11;14;9" dur=".18s" repeatCount="indefinite"/>
     </ellipse>
-    <path d="M ${(-10 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} L ${(-18 * rocketScale).toFixed(1)} ${(-12 * rocketScale).toFixed(1)} L ${(-10 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} Z" fill="#37474f"/>
-    <path d="M ${(-10 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} L ${(-18 * rocketScale).toFixed(1)} ${(12 * rocketScale).toFixed(1)} L ${(-10 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} Z" fill="#37474f"/>
-    <path d="M ${(-10 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} L ${(8 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} Q ${(18 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} ${(24 * rocketScale).toFixed(1)} 0 Q ${(18 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} ${(8 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} L ${(-10 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} Z" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.2"/>
-    <path d="M ${(-7 * rocketScale).toFixed(1)} ${(-5 * rocketScale).toFixed(1)} L ${(7 * rocketScale).toFixed(1)} ${(-5 * rocketScale).toFixed(1)} L ${(12 * rocketScale).toFixed(1)} 0 L ${(7 * rocketScale).toFixed(1)} ${(5 * rocketScale).toFixed(1)} L ${(-7 * rocketScale).toFixed(1)} ${(5 * rocketScale).toFixed(1)} Z" fill="#dbeafe" opacity=".82"/>
-    <path d="M ${(-4 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} L ${(-4 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)}" stroke="#94a3b8" stroke-width="1.4"/>
-    <path d="M ${(8 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} Q ${(16 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} ${(20 * rocketScale).toFixed(1)} 0 Q ${(16 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} ${(8 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} Z" fill="#ff5722"/>
-    <circle cx="${(-2 * rocketScale).toFixed(1)}" cy="0" r="${(3.2 * rocketScale).toFixed(1)}" fill="#29b6f6"/>
-    <animateMotion path="M ${startX.toFixed(1)} ${centerY.toFixed(1)} C ${(width * .28).toFixed(1)} ${(centerY - 18).toFixed(1)}, ${(width * .66).toFixed(1)} ${(centerY + 14).toFixed(1)}, ${endX.toFixed(1)} ${centerY.toFixed(1)}" keyPoints="0;1;1" keyTimes="0;.286;1" dur="${cycleDuration}s" repeatCount="indefinite"/>
+    <image href="rocket-v2.png" x="-100" y="-55" width="200" height="110" preserveAspectRatio="xMidYMid meet"/>
+    <animateMotion path="${flightPath}" rotate="auto" keyPoints="0;1;1" keyTimes="0;.286;1" dur="${cycleDuration}s" repeatCount="indefinite"/>
     <animate attributeName="opacity" values="1;1;0;0;1" keyTimes="0;.27;.286;.985;1" dur="${cycleDuration}s" repeatCount="indefinite"/>
   </g>
 </svg>
