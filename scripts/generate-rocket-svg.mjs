@@ -148,15 +148,15 @@ export function buildSVG(calendar) {
   const rocketScale = 2;
 
   // Smoke trail - heavy particles that fade out
-  const smokeTrail = Array.from({ length: 30 }, (_, i) => {
+  const smokeTrail = Array.from({ length: 38 }, (_, i) => {
     const delay = (i * 0.05).toFixed(2);
     const offsetX = Math.random() * 20 - 10;
     const offsetY = Math.random() * 30 - 15;
     const size = Math.random() * 6 + 4;
-    return `<circle cx="${startX}" cy="${centerY + offsetY}" r="${size.toFixed(1)}" fill="#4b5563" opacity="0.5">
-      <animate attributeName="cx" from="${startX}" to="${endX + offsetX}" dur="${blastDuration.toFixed(2)}s" begin="${delay}s;${(Number(delay) + cycleDuration).toFixed(2)}s" repeatCount="indefinite"/>
-      <animate attributeName="opacity" from="0.6" to="0" dur="${blastDuration.toFixed(2)}s" begin="${delay}s;${(Number(delay) + cycleDuration).toFixed(2)}s" repeatCount="indefinite"/>
-      <animate attributeName="r" from="${size.toFixed(1)}" to="${(size * 2).toFixed(1)}" dur="${blastDuration.toFixed(2)}s" begin="${delay}s;${(Number(delay) + cycleDuration).toFixed(2)}s" repeatCount="indefinite"/>
+    return `<circle cx="${startX}" cy="${centerY + offsetY}" r="${size.toFixed(1)}" fill="#94a3b8">
+      <animate attributeName="cx" values="${startX};${endX + offsetX};${endX + offsetX}" keyTimes="0;.286;1" dur="${cycleDuration}s" begin="${delay}s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values=".42;.35;0;0" keyTimes="0;.286;.57;1" dur="${cycleDuration}s" begin="${delay}s" repeatCount="indefinite"/>
+      <animate attributeName="r" values="${size.toFixed(1)};${(size * 2.8).toFixed(1)};${(size * 2.8).toFixed(1)}" keyTimes="0;.57;1" dur="${cycleDuration}s" begin="${delay}s" repeatCount="indefinite"/>
     </circle>`;
   }).join("\n    ");
 
@@ -194,10 +194,10 @@ export function buildSVG(calendar) {
     </ellipse>
     <path d="M ${(-10 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} L ${(-18 * rocketScale).toFixed(1)} ${(-12 * rocketScale).toFixed(1)} L ${(-10 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} Z" fill="#37474f"/>
     <path d="M ${(-10 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} L ${(-18 * rocketScale).toFixed(1)} ${(12 * rocketScale).toFixed(1)} L ${(-10 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} Z" fill="#37474f"/>
-    <path d="M ${(-10 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} L ${(8 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} Q ${(16 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} ${(20 * rocketScale).toFixed(1)} 0 Q ${(16 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} ${(8 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} L ${(-10 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} Z" fill="#eceff1" stroke="#b0bec5" stroke-width="0.8"/>
+    <path d="M ${(-10 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} L ${(8 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} Q ${(18 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} ${(24 * rocketScale).toFixed(1)} 0 Q ${(18 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} ${(8 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} L ${(-10 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} Z" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.2"/>
     <path d="M ${(8 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} Q ${(16 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} ${(20 * rocketScale).toFixed(1)} 0 Q ${(16 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} ${(8 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} Z" fill="#ff5722"/>
     <circle cx="${(-2 * rocketScale).toFixed(1)}" cy="0" r="${(3.2 * rocketScale).toFixed(1)}" fill="#29b6f6"/>
-    <animateTransform attributeName="transform" type="translate" values="${startX.toFixed(1)} ${centerY.toFixed(1)};${endX.toFixed(1)} ${centerY.toFixed(1)};${endX.toFixed(1)} ${centerY.toFixed(1)}" keyTimes="0;.286;1" dur="${cycleDuration}s" repeatCount="indefinite"/>
+    <animateMotion path="M ${startX.toFixed(1)} ${centerY.toFixed(1)} C ${(width * .28).toFixed(1)} ${(centerY - 18).toFixed(1)}, ${(width * .66).toFixed(1)} ${(centerY + 14).toFixed(1)}, ${endX.toFixed(1)} ${centerY.toFixed(1)}" keyPoints="0;1;1" keyTimes="0;.286;1" dur="${cycleDuration}s" repeatCount="indefinite"/>
     <animate attributeName="opacity" values="1;1;0;0;1" keyTimes="0;.27;.286;.985;1" dur="${cycleDuration}s" repeatCount="indefinite"/>
   </g>
 </svg>
