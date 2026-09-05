@@ -1,16 +1,25 @@
-## Hi there 👋
+# Hey, I'm Srijan 👋
 
-<!--
-**SrijanCherupally/SrijanCherupally** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+I build software for rockets and the systems around them. Most of what I make sits somewhere between code, sensors, and the question: “will this still work when the rocket is moving fast?”
 
-Here are some ideas to get you started:
+Right now, I’m focused on TARC projects, especially flight software, altitude prediction, and airbrake control.
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+## What I’m working on
+
+- [Airbrakes V3](https://github.com/SrijanCherupally/Airbrakes-V3) — software for my TARC airbrakes project for the 2026–27 season, written in C++.
+- [rocketPredictor](https://github.com/SrijanCherupally/rocketPredictor) — a TypeScript tool for predicting TARC rocket altitude.
+- Building and testing things that use real sensor data, not just ideal inputs.
+
+## Tools I reach for
+
+C++ · TypeScript · Embedded systems · Sensors · GitHub
+
+## GitHub stats
+
+<p align="center">
+  <img src="https://github-readme-stats.vercel.app/api?username=SrijanCherupally&show_icons=true&hide_border=true&rank_icon=github" alt="Srijan's GitHub stats" />
+  <br />
+  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=SrijanCherupally&layout=compact&hide_border=true" alt="Top languages" />
+</p>
+
+Thanks for stopping by.
