@@ -125,12 +125,14 @@ export function buildSVG(calendar) {
   const daySquares = allCells
     .map((cell) => {
       // Darken the colors for dark theme compatibility
-      // GitHub's light empty-cell colour is nearly white; force a dark base.
-      let color = cell.contributionCount === 0 ? "#161b22" : adjustColorForDarkMode(cell.color);
+      // Never inherit GitHub's light-theme greys.
+      const color = cell.contributionCount === 0 ? "#161b22" : cell.contributionCount === 1 ? "#0e4429" : cell.contributionCount === 2 ? "#006d32" : cell.contributionCount === 3 ? "#26a641" : "#39d353";
+      const fadeAt = ((cell.w / Math.max(1, numWeeks - 1)) * blastDuration / cycleDuration).toFixed(3);
+      const fadeOut = (Number(fadeAt) + 0.018).toFixed(3);
       return `<rect id="cell-${cell.w}-${cell.dayIdx}" x="${(cell.x - CELL / 2).toFixed(1)}" y="${(cell.y - CELL / 2).toFixed(
         1
       )}" width="${CELL}" height="${CELL}" rx="2" fill="${color}">
-        <animate attributeName="opacity" values="1;0;1" dur="${blastDuration.toFixed(2)}s" begin="${(Number(blastDuration) + cycleDuration).toFixed(2)}s;${(Number(blastDuration) * 2 + cycleDuration * 2).toFixed(2)}s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="1;1;0;0;1" keyTimes="0;${fadeAt};${fadeOut};.985;1" dur="${cycleDuration}s" repeatCount="indefinite"/>
       </rect>`;
     })
     .join("\n    ");
@@ -185,7 +187,7 @@ export function buildSVG(calendar) {
     ${smokeTrail}
   </g>
 
-  <g id="rocket" filter="url(#glow)" transform="translate(${startX.toFixed(1)} ${centerY.toFixed(1)})">
+  <g id="rocket" filter="url(#glow)">
     <!-- Scaled up rocket: 2x bigger -->
     <ellipse cx="${(-22 * rocketScale).toFixed(1)}" cy="0" rx="${(12 * rocketScale).toFixed(1)}" ry="${(6 * rocketScale).toFixed(1)}" fill="url(#flame)">
       <animate attributeName="rx" values="${(8 * rocketScale).toFixed(1)};${(14 * rocketScale).toFixed(1)};${(8 * rocketScale).toFixed(1)}" dur="0.15s" repeatCount="indefinite"/>
@@ -196,7 +198,7 @@ export function buildSVG(calendar) {
     <path d="M ${(8 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} Q ${(16 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} ${(20 * rocketScale).toFixed(1)} 0 Q ${(16 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} ${(8 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} Z" fill="#ff5722"/>
     <circle cx="${(-2 * rocketScale).toFixed(1)}" cy="0" r="${(3.2 * rocketScale).toFixed(1)}" fill="#29b6f6"/>
     <animateTransform attributeName="transform" type="translate" values="${startX.toFixed(1)} ${centerY.toFixed(1)};${endX.toFixed(1)} ${centerY.toFixed(1)};${endX.toFixed(1)} ${centerY.toFixed(1)}" keyTimes="0;.286;1" dur="${cycleDuration}s" repeatCount="indefinite"/>
-    <animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;.02;.26;.30;1" dur="${cycleDuration}s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="1;1;0;0;1" keyTimes="0;.27;.286;.985;1" dur="${cycleDuration}s" repeatCount="indefinite"/>
   </g>
 </svg>
 `;
