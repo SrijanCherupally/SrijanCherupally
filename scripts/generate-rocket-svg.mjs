@@ -145,7 +145,8 @@ export function buildSVG(calendar) {
     .join("\n    ");
 
   // Large rocket
-  const rocketScale = 2;
+  const rocketScale = 3;
+  const flightPath = `M ${startX.toFixed(1)} ${centerY.toFixed(1)} C ${(width * .28).toFixed(1)} ${(centerY - 18).toFixed(1)}, ${(width * .66).toFixed(1)} ${(centerY + 14).toFixed(1)}, ${endX.toFixed(1)} ${centerY.toFixed(1)}`;
 
   // Smoke trail - heavy particles that fade out
   const smokeTrail = Array.from({ length: 38 }, (_, i) => {
@@ -183,6 +184,11 @@ export function buildSVG(calendar) {
     ${daySquares}
   </g>
 
+  <path d="${flightPath}" fill="none" stroke="#fb923c" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="7 9" opacity=".62">
+    <animate attributeName="stroke-dashoffset" from="0" to="-96" dur="1.2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values=".18;.78;.18" dur="${cycleDuration}s" repeatCount="indefinite"/>
+  </path>
+
   <g id="smokeTrail" opacity="0.7">
     ${smokeTrail}
   </g>
@@ -195,6 +201,8 @@ export function buildSVG(calendar) {
     <path d="M ${(-10 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} L ${(-18 * rocketScale).toFixed(1)} ${(-12 * rocketScale).toFixed(1)} L ${(-10 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} Z" fill="#37474f"/>
     <path d="M ${(-10 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} L ${(-18 * rocketScale).toFixed(1)} ${(12 * rocketScale).toFixed(1)} L ${(-10 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} Z" fill="#37474f"/>
     <path d="M ${(-10 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} L ${(8 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} Q ${(18 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} ${(24 * rocketScale).toFixed(1)} 0 Q ${(18 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} ${(8 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} L ${(-10 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} Z" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.2"/>
+    <path d="M ${(-7 * rocketScale).toFixed(1)} ${(-5 * rocketScale).toFixed(1)} L ${(7 * rocketScale).toFixed(1)} ${(-5 * rocketScale).toFixed(1)} L ${(12 * rocketScale).toFixed(1)} 0 L ${(7 * rocketScale).toFixed(1)} ${(5 * rocketScale).toFixed(1)} L ${(-7 * rocketScale).toFixed(1)} ${(5 * rocketScale).toFixed(1)} Z" fill="#dbeafe" opacity=".82"/>
+    <path d="M ${(-4 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} L ${(-4 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)}" stroke="#94a3b8" stroke-width="1.4"/>
     <path d="M ${(8 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} Q ${(16 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} ${(20 * rocketScale).toFixed(1)} 0 Q ${(16 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} ${(8 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} Z" fill="#ff5722"/>
     <circle cx="${(-2 * rocketScale).toFixed(1)}" cy="0" r="${(3.2 * rocketScale).toFixed(1)}" fill="#29b6f6"/>
     <animateMotion path="M ${startX.toFixed(1)} ${centerY.toFixed(1)} C ${(width * .28).toFixed(1)} ${(centerY - 18).toFixed(1)}, ${(width * .66).toFixed(1)} ${(centerY + 14).toFixed(1)}, ${endX.toFixed(1)} ${centerY.toFixed(1)}" keyPoints="0;1;1" keyTimes="0;.286;1" dur="${cycleDuration}s" repeatCount="indefinite"/>
