@@ -31,14 +31,12 @@ jobs:
       - name: Push to output branch
         run: |
           cp assets/rocket-calendar.svg /tmp/rocket-calendar.svg
-          cp assets/rocket-v2.png /tmp/rocket-v2.png
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git checkout --orphan output
           git rm -rf . > /dev/null 2>&1 || true
           mkdir -p assets
           cp /tmp/rocket-calendar.svg assets/rocket-calendar.svg
-          cp /tmp/rocket-v2.png assets/rocket-v2.png
-          git add assets/rocket-calendar.svg assets/rocket-v2.png
+          git add assets/rocket-calendar.svg
           git commit -m "chore: update rocket calendar" --allow-empty
           git push -f origin output
