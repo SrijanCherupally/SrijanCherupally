@@ -63,6 +63,21 @@ function monthLabel(dateStr) {
   return new Date(dateStr + "T00:00:00Z").toLocaleString("en-US", { month: "short", timeZone: "UTC" });
 }
 
+function adjustColorForDarkMode(hexColor) {
+  // Convert hex to RGB
+  const hex = hexColor.replace("#", "");
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+
+  // Reduce brightness by mixing with dark color for dark theme
+  const darkR = Math.floor(r * 0.6);
+  const darkG = Math.floor(g * 0.6);
+  const darkB = Math.floor(b * 0.6);
+
+  return `#${darkR.toString(16).padStart(2, "0")}${darkG.toString(16).padStart(2, "0")}${darkB.toString(16).padStart(2, "0")}`;
+}
+
 /**
  * Builds the SVG string from a contributionCalendar object
  * ({ totalContributions, weeks: [{ contributionDays: [...] }] }).
@@ -74,13 +89,24 @@ export function buildSVG(calendar) {
   const width = MARGIN_L + numWeeks * (CELL + GAP) - GAP + MARGIN_R;
   const height = MARGIN_T + 7 * (CELL + GAP) - GAP + MARGIN_B;
 
-  // Blast straight across the calendar horizontally, then loop back
-  const startX = MARGIN_L - 20;
-  const endX = MARGIN_L + numWeeks * (CELL + GAP) + 20;
-  const centerY = MARGIN_T + 3 * (CELL + GAP); // middle of the calendar
+  // Collect all cells with their positions
+  const allCells = [];
+  weeks.forEach((week, w) => {
+    const days = week.contributionDays;
+    days.forEach((day, dayIdx) => {
+      const cx = MARGIN_L + w * (CELL + GAP) + CELL / 2;
+      const cy = MARGIN_T + dayIdx * (CELL + GAP) + CELL / 2;
+      allCells.push({ ...day, x: cx, y: cy, w, dayIdx });
+    });
+  });
 
   const blastDuration = 2; // 2 seconds to blast across
-  const loopCycle = 7; // 7 seconds total loop
+  const cycleDuration = 7; // 7 seconds total cycle
+  const restDuration = cycleDuration - blastDuration; // 5 seconds rest
+
+  const startX = MARGIN_L - 30;
+  const endX = MARGIN_L + numWeeks * (CELL + GAP) + 30;
+  const centerY = MARGIN_T + 3 * (CELL + GAP) + CELL / 2; // middle of the calendar
 
   // Month labels: mark the week where a new month starts (first day only).
   const monthLabels = [];
@@ -95,16 +121,19 @@ export function buildSVG(calendar) {
     }
   });
 
-  const daySquares = weeks
-    .flatMap((week, w) => {
-      const days = week.contributionDays;
-      return days.map((day, dayIdx) => {
-        const cx = MARGIN_L + w * (CELL + GAP) + CELL / 2;
-        const cy = MARGIN_T + dayIdx * (CELL + GAP) + CELL / 2;
-        return `<rect x="${(cx - CELL / 2).toFixed(1)}" y="${(cy - CELL / 2).toFixed(
-          1
-        )}" width="${CELL}" height="${CELL}" rx="2" fill="${day.color}"/>`;
-      });
+  // Dark mode friendly calendar squares - muted/dimmed versions
+  const daySquares = allCells
+    .map((cell) => {
+      // Darken the colors for dark theme compatibility
+      let color = cell.color;
+      if (color !== "#161b22") { // skip if already dark
+        color = adjustColorForDarkMode(color);
+      }
+      return `<rect id="cell-${cell.w}-${cell.dayIdx}" x="${(cell.x - CELL / 2).toFixed(1)}" y="${(cell.y - CELL / 2).toFixed(
+        1
+      )}" width="${CELL}" height="${CELL}" rx="2" fill="${color}">
+        <animate attributeName="opacity" values="1;0;1" dur="${blastDuration.toFixed(2)}s" begin="${(Number(blastDuration) + cycleDuration).toFixed(2)}s;${(Number(blastDuration) * 2 + cycleDuration * 2).toFixed(2)}s" repeatCount="indefinite"/>
+      </rect>`;
     })
     .join("\n    ");
 
@@ -115,40 +144,33 @@ export function buildSVG(calendar) {
     )
     .join("\n    ");
 
-  // Smoke particles: scattered during blast across
-  const smokeParticles = Array.from({ length: 20 }, (_, i) => {
-    const startDelay = (i * 0.08).toFixed(2);
-    const randomOffset = Math.random() * 40 - 20;
-    const randomY = Math.random() * 20 - 10;
-    return `<circle cx="${startX}" cy="${centerY + randomY}" r="${(Math.random() * 3 + 2).toFixed(1)}" fill="url(#smoke)" opacity="0.6">
-      <animate attributeName="cx" from="${startX}" to="${endX + randomOffset}" dur="${blastDuration.toFixed(2)}s" begin="${startDelay}s;${(Number(startDelay) + loopCycle).toFixed(2)}s" repeatCount="indefinite"/>
-      <animate attributeName="opacity" from="0.7" to="0" dur="${blastDuration.toFixed(2)}s" begin="${startDelay}s;${(Number(startDelay) + loopCycle).toFixed(2)}s" repeatCount="indefinite"/>
-      <animate attributeName="r" from="${(Math.random() * 3 + 2).toFixed(1)}" to="${(Math.random() * 5 + 6).toFixed(1)}" dur="${blastDuration.toFixed(2)}s" begin="${startDelay}s;${(Number(startDelay) + loopCycle).toFixed(2)}s" repeatCount="indefinite"/>
+  // Large rocket
+  const rocketScale = 2;
+
+  // Smoke trail - heavy particles that fade out
+  const smokeTrail = Array.from({ length: 30 }, (_, i) => {
+    const delay = (i * 0.05).toFixed(2);
+    const offsetX = Math.random() * 20 - 10;
+    const offsetY = Math.random() * 30 - 15;
+    const size = Math.random() * 6 + 4;
+    return `<circle cx="${startX}" cy="${centerY + offsetY}" r="${size.toFixed(1)}" fill="#4b5563" opacity="0.5">
+      <animate attributeName="cx" from="${startX}" to="${endX + offsetX}" dur="${blastDuration.toFixed(2)}s" begin="${delay}s;${(Number(delay) + cycleDuration).toFixed(2)}s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" from="0.6" to="0" dur="${blastDuration.toFixed(2)}s" begin="${delay}s;${(Number(delay) + cycleDuration).toFixed(2)}s" repeatCount="indefinite"/>
+      <animate attributeName="r" from="${size.toFixed(1)}" to="${(size * 2).toFixed(1)}" dur="${blastDuration.toFixed(2)}s" begin="${delay}s;${(Number(delay) + cycleDuration).toFixed(2)}s" repeatCount="indefinite"/>
     </circle>`;
   }).join("\n    ");
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
   <defs>
-    <radialGradient id="smoke" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#9ca3af" stop-opacity="0.6"/>
-      <stop offset="100%" stop-color="#6b7280" stop-opacity="0"/>
-    </radialGradient>
     <radialGradient id="flame" cx="50%" cy="50%" r="50%">
       <stop offset="0%" stop-color="#fff59d"/>
       <stop offset="45%" stop-color="#ff9800"/>
       <stop offset="100%" stop-color="#ff5722" stop-opacity="0"/>
     </radialGradient>
-    <filter id="smokeGlow">
-      <feGaussianBlur in="SourceGraphic" stdDeviation="1.5"/>
+    <filter id="glow">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2.5"/>
+      <feColorMatrix type="saturate" values="1.5"/>
     </filter>
-    <style>
-      @media (prefers-color-scheme: dark) {
-        #smokeLayer { filter: opacity(0.7); }
-      }
-      @media (prefers-color-scheme: light) {
-        #smokeLayer { filter: opacity(0.5); }
-      }
-    </style>
   </defs>
 
   <rect x="0" y="0" width="${width}" height="${height}" fill="transparent"/>
@@ -157,25 +179,25 @@ export function buildSVG(calendar) {
     ${monthLabelSvg}
   </g>
 
-  <g>
+  <g id="calendar">
     ${daySquares}
   </g>
 
-  <g id="smokeLayer" filter="url(#smokeGlow)">
-    ${smokeParticles}
+  <g id="smokeTrail" opacity="0.7">
+    ${smokeTrail}
   </g>
 
-  <g id="rocket">
-    <ellipse cx="-11" cy="0" rx="6" ry="3" fill="url(#flame)">
-      <animate attributeName="rx" values="4;7;4" dur="0.15s" repeatCount="indefinite"/>
+  <g id="rocket" filter="url(#glow)">
+    <!-- Scaled up rocket: 2x bigger -->
+    <ellipse cx="${(startX - 22).toFixed(1)}" cy="${centerY.toFixed(1)}" rx="${(12 * rocketScale).toFixed(1)}" ry="${(6 * rocketScale).toFixed(1)}" fill="url(#flame)">
+      <animate attributeName="rx" values="${(8 * rocketScale).toFixed(1)};${(14 * rocketScale).toFixed(1)};${(8 * rocketScale).toFixed(1)}" dur="0.15s" repeatCount="indefinite"/>
     </ellipse>
-    <path d="M -5 -3 L -9 -6 L -5 -3 Z" fill="#37474f"/>
-    <path d="M -5 3 L -9 6 L -5 3 Z" fill="#37474f"/>
-    <path d="M -5 -3 L 4 -3 Q 8 -3 10 0 Q 8 3 4 3 L -5 3 Z" fill="#eceff1" stroke="#b0bec5" stroke-width="0.4"/>
-    <path d="M 4 -3 Q 8 -3 10 0 Q 8 3 4 3 Z" fill="#ff5722"/>
-    <circle cx="-1" cy="0" r="1.6" fill="#29b6f6"/>
-    <animate attributeName="cx" from="${startX}" to="${endX}" dur="${blastDuration.toFixed(2)}s" begin="0s;${loopCycle.toFixed(2)}s" repeatCount="indefinite"/>
-    <animate attributeName="cy" from="${centerY}" to="${centerY}" dur="${blastDuration.toFixed(2)}s" begin="0s;${loopCycle.toFixed(2)}s" repeatCount="indefinite"/>
+    <path d="M ${(-10 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} L ${(-18 * rocketScale).toFixed(1)} ${(-12 * rocketScale).toFixed(1)} L ${(-10 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} Z" fill="#37474f"/>
+    <path d="M ${(-10 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} L ${(-18 * rocketScale).toFixed(1)} ${(12 * rocketScale).toFixed(1)} L ${(-10 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} Z" fill="#37474f"/>
+    <path d="M ${(-10 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} L ${(8 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} Q ${(16 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} ${(20 * rocketScale).toFixed(1)} 0 Q ${(16 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} ${(8 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} L ${(-10 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} Z" fill="#eceff1" stroke="#b0bec5" stroke-width="0.8"/>
+    <path d="M ${(8 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} Q ${(16 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} ${(20 * rocketScale).toFixed(1)} 0 Q ${(16 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} ${(8 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} Z" fill="#ff5722"/>
+    <circle cx="${(-2 * rocketScale).toFixed(1)}" cy="0" r="${(3.2 * rocketScale).toFixed(1)}" fill="#29b6f6"/>
+    <animate attributeName="cx" from="${startX.toFixed(1)}" to="${endX.toFixed(1)}" dur="${blastDuration.toFixed(2)}s" begin="0s;${cycleDuration.toFixed(2)}s" repeatCount="indefinite"/>
   </g>
 </svg>
 `;
