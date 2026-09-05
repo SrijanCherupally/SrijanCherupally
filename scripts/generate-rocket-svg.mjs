@@ -125,10 +125,8 @@ export function buildSVG(calendar) {
   const daySquares = allCells
     .map((cell) => {
       // Darken the colors for dark theme compatibility
-      let color = cell.color;
-      if (color !== "#161b22") { // skip if already dark
-        color = adjustColorForDarkMode(color);
-      }
+      // GitHub's light empty-cell colour is nearly white; force a dark base.
+      let color = cell.contributionCount === 0 ? "#161b22" : adjustColorForDarkMode(cell.color);
       return `<rect id="cell-${cell.w}-${cell.dayIdx}" x="${(cell.x - CELL / 2).toFixed(1)}" y="${(cell.y - CELL / 2).toFixed(
         1
       )}" width="${CELL}" height="${CELL}" rx="2" fill="${color}">
@@ -187,9 +185,9 @@ export function buildSVG(calendar) {
     ${smokeTrail}
   </g>
 
-  <g id="rocket" filter="url(#glow)">
+  <g id="rocket" filter="url(#glow)" transform="translate(${startX.toFixed(1)} ${centerY.toFixed(1)})">
     <!-- Scaled up rocket: 2x bigger -->
-    <ellipse cx="${(startX - 22).toFixed(1)}" cy="${centerY.toFixed(1)}" rx="${(12 * rocketScale).toFixed(1)}" ry="${(6 * rocketScale).toFixed(1)}" fill="url(#flame)">
+    <ellipse cx="${(-22 * rocketScale).toFixed(1)}" cy="0" rx="${(12 * rocketScale).toFixed(1)}" ry="${(6 * rocketScale).toFixed(1)}" fill="url(#flame)">
       <animate attributeName="rx" values="${(8 * rocketScale).toFixed(1)};${(14 * rocketScale).toFixed(1)};${(8 * rocketScale).toFixed(1)}" dur="0.15s" repeatCount="indefinite"/>
     </ellipse>
     <path d="M ${(-10 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} L ${(-18 * rocketScale).toFixed(1)} ${(-12 * rocketScale).toFixed(1)} L ${(-10 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} Z" fill="#37474f"/>
@@ -197,7 +195,8 @@ export function buildSVG(calendar) {
     <path d="M ${(-10 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} L ${(8 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} Q ${(16 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} ${(20 * rocketScale).toFixed(1)} 0 Q ${(16 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} ${(8 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} L ${(-10 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} Z" fill="#eceff1" stroke="#b0bec5" stroke-width="0.8"/>
     <path d="M ${(8 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} Q ${(16 * rocketScale).toFixed(1)} ${(-6 * rocketScale).toFixed(1)} ${(20 * rocketScale).toFixed(1)} 0 Q ${(16 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} ${(8 * rocketScale).toFixed(1)} ${(6 * rocketScale).toFixed(1)} Z" fill="#ff5722"/>
     <circle cx="${(-2 * rocketScale).toFixed(1)}" cy="0" r="${(3.2 * rocketScale).toFixed(1)}" fill="#29b6f6"/>
-    <animate attributeName="cx" from="${startX.toFixed(1)}" to="${endX.toFixed(1)}" dur="${blastDuration.toFixed(2)}s" begin="0s;${cycleDuration.toFixed(2)}s" repeatCount="indefinite"/>
+    <animateTransform attributeName="transform" type="translate" values="${startX.toFixed(1)} ${centerY.toFixed(1)};${endX.toFixed(1)} ${centerY.toFixed(1)};${endX.toFixed(1)} ${centerY.toFixed(1)}" keyTimes="0;.286;1" dur="${cycleDuration}s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;.02;.26;.30;1" dur="${cycleDuration}s" repeatCount="indefinite"/>
   </g>
 </svg>
 `;
