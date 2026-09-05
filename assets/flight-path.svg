@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="260" viewBox="0 0 900 260" role="img" aria-label="Srijan's flight lab: rockets, drones, RC planes, and PCBs">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0b1220"/><stop offset="1" stop-color="#101b31"/></linearGradient>
+    <linearGradient id="trail" x1="0" x2="1"><stop stop-color="#38bdf8"/><stop offset=".5" stop-color="#a78bfa"/><stop offset="1" stop-color="#f97316"/></linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <style>
+      .line{stroke:#263752;stroke-width:1}.label{fill:#9fb2cf;font:12px ui-monospace,monospace;letter-spacing:1px}.title{fill:#e5eefb;font:700 24px ui-sans-serif,system-ui}.small{fill:#6f86a8;font:11px ui-monospace,monospace}.accent{stroke:#38bdf8;fill:none}.pulse{animation:pulse 2s ease-in-out infinite}@keyframes pulse{50%{opacity:.35}}.ship{animation:float 3.5s ease-in-out infinite}@keyframes float{50%{transform:translateY(-6px)}}.dot{animation:dash 4s linear infinite}@keyframes dash{to{stroke-dashoffset:-240}}</style>
+  </defs>
+  <rect width="900" height="260" rx="18" fill="url(#bg)"/>
+  <g opacity=".45"><path class="line" d="M35 48H865M35 104H865M35 160H865M35 216H865M116 28V232M260 28V232M404 28V232M548 28V232M692 28V232M836 28V232"/></g>
+  <text x="42" y="56" class="title">srijan's flight lab</text><text x="44" y="78" class="small">ROCKETS · DRONES · RC · PCBs</text>
+  <path d="M54 183 C165 110 235 226 334 168 S490 93 586 161 S749 212 849 106" fill="none" stroke="url(#trail)" stroke-width="3" stroke-linecap="round" stroke-dasharray="12 12" class="dot" filter="url(#glow)"/>
+  <g class="ship" transform="translate(0 0)">
+    <path d="M305 155l-26 13 26 13 36-13z" fill="#f1f5f9" stroke="#38bdf8" stroke-width="2"/><path d="M305 155v26" class="accent" stroke-width="2"/><path d="M279 168h-18m54 0h22" class="accent" stroke-width="2"/><circle cx="305" cy="168" r="4" fill="#f97316" class="pulse"/>
+  </g>
+  <g class="ship" transform="translate(0 0)"><path d="M579 142l20 20-20 20-20-20z" fill="#e2e8f0" stroke="#a78bfa" stroke-width="2"/><path d="M579 142v40M559 162h40" class="accent" stroke="#a78bfa" stroke-width="2"/><circle cx="579" cy="162" r="5" fill="#f97316" class="pulse"/></g>
+  <g transform="translate(784 82)" class="ship"><path d="M0 28h51L68 15 51 2H0l13 13z" fill="#f1f5f9" stroke="#38bdf8" stroke-width="2"/><path d="M12 15h33M35 2v26" class="accent" stroke-width="2"/><circle cx="55" cy="15" r="4" fill="#f97316" class="pulse"/></g>
+  <g transform="translate(78 119)"><rect width="102" height="62" rx="7" fill="#0e1a2c" stroke="#38bdf8" stroke-width="2"/><path d="M14 16h23v14h17v-14h32M14 46h25V34h22v12h27" class="accent" stroke-width="2"/><circle cx="14" cy="16" r="4" fill="#f97316" class="pulse"/><circle cx="88" cy="46" r="4" fill="#a78bfa" class="pulse"/></g>
+  <g transform="translate(665 45)"><path d="M0 48l14-33 14 33-14 14z" fill="#f8fafc" stroke="#f97316" stroke-width="2"/><path d="M14 15V0M5 48l-6 14h30l-6-14" fill="#f97316" class="pulse"/></g>
+  <text x="78" y="202" class="label">PCB bench</text><text x="270" y="204" class="label">quad</text><text x="545" y="202" class="label">RC flight</text><text x="642" y="128" class="label">launch</text>
+  <circle cx="849" cy="106" r="6" fill="#f97316" filter="url(#glow)" class="pulse"/>
+</svg>
