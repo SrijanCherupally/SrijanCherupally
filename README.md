@@ -2,6 +2,8 @@
 
 I build things for rockets
 
+![srijan's flight lab](./assets/flight-path.svg)
+
 - [Airbrakes V3](https://github.com/SrijanCherupally/Airbrakes-V3)
 - [rocketPredictor](https://github.com/SrijanCherupally/rocketPredictor)
 
