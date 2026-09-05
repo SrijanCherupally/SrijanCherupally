@@ -100,12 +100,8 @@ export function buildSVG(calendar) {
     });
   });
 
-  const blastDuration = 2; // 2 seconds to blast across
-  const cycleDuration = 7; // 7 seconds total cycle
-  const restDuration = cycleDuration - blastDuration; // 5 seconds rest
-
-  const startX = MARGIN_L - 30;
-  const endX = MARGIN_L + numWeeks * (CELL + GAP) + 30;
+  const startX = MARGIN_L + 10;
+  const endX = MARGIN_L + numWeeks * (CELL + GAP) - 12;
   const centerY = MARGIN_T + 3 * (CELL + GAP) + CELL / 2; // middle of the calendar
 
   // Month labels: mark the week where a new month starts (first day only).
@@ -127,13 +123,9 @@ export function buildSVG(calendar) {
       // Darken the colors for dark theme compatibility
       // Never inherit GitHub's light-theme greys.
       const color = cell.contributionCount === 0 ? "#161b22" : cell.contributionCount === 1 ? "#0e4429" : cell.contributionCount === 2 ? "#006d32" : cell.contributionCount === 3 ? "#26a641" : "#39d353";
-      const fadeAt = ((cell.w / Math.max(1, numWeeks - 1)) * blastDuration / cycleDuration).toFixed(3);
-      const fadeOut = (Number(fadeAt) + 0.018).toFixed(3);
       return `<rect id="cell-${cell.w}-${cell.dayIdx}" x="${(cell.x - CELL / 2).toFixed(1)}" y="${(cell.y - CELL / 2).toFixed(
         1
-      )}" width="${CELL}" height="${CELL}" rx="2" fill="${color}">
-        <animate attributeName="opacity" values="1;1;0;0;1" keyTimes="0;${fadeAt};${fadeOut};.985;1" dur="${cycleDuration}s" repeatCount="indefinite"/>
-      </rect>`;
+      )}" width="${CELL}" height="${CELL}" rx="2" fill="${color}"/>`;
     })
     .join("\n    ");
 
@@ -172,7 +164,7 @@ export function buildSVG(calendar) {
 
   <path d="${flightPath}" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-dasharray="5 9" opacity=".5"/>
 
-  <g id="rocket">
+  <g id="rocket" transform="translate(${(width * 0.24).toFixed(1)} ${(centerY - 4).toFixed(1)}) rotate(-4)">
     <path d="M -50 0 L -25 -10 L -25 10 Z" fill="url(#fire)">
       <animate attributeName="d" values="M -50 0 L -25 -10 L -25 10 Z;M -57 0 L -25 -12 L -25 12 Z;M -50 0 L -25 -10 L -25 10 Z" dur=".18s" repeatCount="indefinite"/>
     </path>
@@ -183,8 +175,6 @@ export function buildSVG(calendar) {
     <circle cx="1" cy="0" r="7" fill="#39c6dc" stroke="#1f2937" stroke-width="2"/>
     <circle cx="-22" cy="0" r="5" fill="#374151" stroke="#1f2937" stroke-width="2"/>
     <path d="M -12 -9 L 13 -9" stroke="#ffffff" stroke-width="2" opacity=".7" stroke-linecap="round"/>
-    <animateMotion path="${flightPath}" rotate="auto" keyPoints="0;1;1" keyTimes="0;.286;1" dur="${cycleDuration}s" repeatCount="indefinite"/>
-    <animate attributeName="opacity" values="1;1;0;0;1" keyTimes="0;.27;.286;.985;1" dur="${cycleDuration}s" repeatCount="indefinite"/>
   </g>
 </svg>
 `;
