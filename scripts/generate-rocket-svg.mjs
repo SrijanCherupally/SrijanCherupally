@@ -60,8 +60,7 @@ async function fetchCalendar(username, token) {
 }
 
 function monthLabel(dateStr) {
-  const d = new Date(dateStr + "T00:00:00Z");
-  return d.toLocaleString("en-US", { month: "short", timeZone: "UTC" });
+  return new Date(dateStr + "T00:00:00Z").toLocaleString("en-US", { month: "short", timeZone: "UTC" });
 }
 
 /**
@@ -75,23 +74,13 @@ export function buildSVG(calendar) {
   const width = MARGIN_L + numWeeks * (CELL + GAP) - GAP + MARGIN_R;
   const height = MARGIN_T + 7 * (CELL + GAP) - GAP + MARGIN_B;
 
-  // Flatten into a boustrophedon (zig-zag) flight path: down column 0,
-  // up column 1, down column 2, ... so the rocket's motion is continuous.
-  const cells = [];
-  weeks.forEach((week, w) => {
-    const days = week.contributionDays;
-    const order = w % 2 === 0 ? days.map((d, i) => i) : days.map((d, i) => i).reverse();
-    order.forEach((dayIdx) => {
-      const day = days[dayIdx];
-      if (!day) return;
-      const cx = MARGIN_L + w * (CELL + GAP) + CELL / 2;
-      const cy = MARGIN_T + dayIdx * (CELL + GAP) + CELL / 2;
-      cells.push({ ...day, x: cx, y: cy, week: w });
-    });
-  });
+  // Blast straight across the calendar horizontally, then loop back
+  const startX = MARGIN_L - 20;
+  const endX = MARGIN_L + numWeeks * (CELL + GAP) + 20;
+  const centerY = MARGIN_T + 3 * (CELL + GAP); // middle of the calendar
 
-  const totalDuration = Math.max(8, Math.min(28, cells.length * 0.045)); // seconds
-  const step = totalDuration / cells.length;
+  const blastDuration = 2; // 2 seconds to blast across
+  const loopCycle = 7; // 7 seconds total loop
 
   // Month labels: mark the week where a new month starts (first day only).
   const monthLabels = [];
@@ -106,25 +95,16 @@ export function buildSVG(calendar) {
     }
   });
 
-  const daySquares = cells
-    .map(
-      (c) =>
-        `<rect x="${(c.x - CELL / 2).toFixed(1)}" y="${(c.y - CELL / 2).toFixed(
+  const daySquares = weeks
+    .flatMap((week, w) => {
+      const days = week.contributionDays;
+      return days.map((day, dayIdx) => {
+        const cx = MARGIN_L + w * (CELL + GAP) + CELL / 2;
+        const cy = MARGIN_T + dayIdx * (CELL + GAP) + CELL / 2;
+        return `<rect x="${(cx - CELL / 2).toFixed(1)}" y="${(cy - CELL / 2).toFixed(
           1
-        )}" width="${CELL}" height="${CELL}" rx="2" fill="${c.color}"/>`
-    )
-    .join("\n    ");
-
-  const glowSquares = cells
-    .map((c, i) => {
-      const begin = (i * step).toFixed(2);
-      return `<rect x="${(c.x - CELL / 2).toFixed(1)}" y="${(c.y - CELL / 2).toFixed(
-        1
-      )}" width="${CELL}" height="${CELL}" rx="2" fill="#ffffff" opacity="0">
-      <animate attributeName="opacity" values="0;0.85;0" dur="0.5s" begin="${begin}s;${(
-        Number(begin) + totalDuration
-      ).toFixed(2)}s" repeatCount="indefinite"/>
-    </rect>`;
+        )}" width="${CELL}" height="${CELL}" rx="2" fill="${day.color}"/>`;
+      });
     })
     .join("\n    ");
 
@@ -135,19 +115,40 @@ export function buildSVG(calendar) {
     )
     .join("\n    ");
 
-  // Flight path: straight lines through every cell center, in flight order.
-  const pathD = cells
-    .map((c, i) => `${i === 0 ? "M" : "L"} ${c.x.toFixed(1)} ${c.y.toFixed(1)}`)
-    .join(" ");
+  // Smoke particles: scattered during blast across
+  const smokeParticles = Array.from({ length: 20 }, (_, i) => {
+    const startDelay = (i * 0.08).toFixed(2);
+    const randomOffset = Math.random() * 40 - 20;
+    const randomY = Math.random() * 20 - 10;
+    return `<circle cx="${startX}" cy="${centerY + randomY}" r="${(Math.random() * 3 + 2).toFixed(1)}" fill="url(#smoke)" opacity="0.6">
+      <animate attributeName="cx" from="${startX}" to="${endX + randomOffset}" dur="${blastDuration.toFixed(2)}s" begin="${startDelay}s;${(Number(startDelay) + loopCycle).toFixed(2)}s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" from="0.7" to="0" dur="${blastDuration.toFixed(2)}s" begin="${startDelay}s;${(Number(startDelay) + loopCycle).toFixed(2)}s" repeatCount="indefinite"/>
+      <animate attributeName="r" from="${(Math.random() * 3 + 2).toFixed(1)}" to="${(Math.random() * 5 + 6).toFixed(1)}" dur="${blastDuration.toFixed(2)}s" begin="${startDelay}s;${(Number(startDelay) + loopCycle).toFixed(2)}s" repeatCount="indefinite"/>
+    </circle>`;
+  }).join("\n    ");
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
   <defs>
+    <radialGradient id="smoke" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#9ca3af" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#6b7280" stop-opacity="0"/>
+    </radialGradient>
     <radialGradient id="flame" cx="50%" cy="50%" r="50%">
       <stop offset="0%" stop-color="#fff59d"/>
       <stop offset="45%" stop-color="#ff9800"/>
       <stop offset="100%" stop-color="#ff5722" stop-opacity="0"/>
     </radialGradient>
-    <path id="flightPath" d="${pathD}" fill="none"/>
+    <filter id="smokeGlow">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="1.5"/>
+    </filter>
+    <style>
+      @media (prefers-color-scheme: dark) {
+        #smokeLayer { filter: opacity(0.7); }
+      }
+      @media (prefers-color-scheme: light) {
+        #smokeLayer { filter: opacity(0.5); }
+      }
+    </style>
   </defs>
 
   <rect x="0" y="0" width="${width}" height="${height}" fill="transparent"/>
@@ -160,8 +161,8 @@ export function buildSVG(calendar) {
     ${daySquares}
   </g>
 
-  <g>
-    ${glowSquares}
+  <g id="smokeLayer" filter="url(#smokeGlow)">
+    ${smokeParticles}
   </g>
 
   <g id="rocket">
@@ -173,9 +174,8 @@ export function buildSVG(calendar) {
     <path d="M -5 -3 L 4 -3 Q 8 -3 10 0 Q 8 3 4 3 L -5 3 Z" fill="#eceff1" stroke="#b0bec5" stroke-width="0.4"/>
     <path d="M 4 -3 Q 8 -3 10 0 Q 8 3 4 3 Z" fill="#ff5722"/>
     <circle cx="-1" cy="0" r="1.6" fill="#29b6f6"/>
-    <animateMotion dur="${totalDuration.toFixed(2)}s" repeatCount="indefinite" rotate="auto">
-      <mpath href="#flightPath"/>
-    </animateMotion>
+    <animate attributeName="cx" from="${startX}" to="${endX}" dur="${blastDuration.toFixed(2)}s" begin="0s;${loopCycle.toFixed(2)}s" repeatCount="indefinite"/>
+    <animate attributeName="cy" from="${centerY}" to="${centerY}" dur="${blastDuration.toFixed(2)}s" begin="0s;${loopCycle.toFixed(2)}s" repeatCount="indefinite"/>
   </g>
 </svg>
 `;
