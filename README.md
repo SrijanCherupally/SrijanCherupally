@@ -6,5 +6,7 @@ I build things for rockets.
 - [rocketPredictor](https://github.com/SrijanCherupally/rocketPredictor)
 
 <picture>
-  <img alt="rocket contribution calendar" src="https://raw.githubusercontent.com/SrijanCherupally/SrijanCherupally/output/assets/rocket-calendar.svg?v=4a642a3">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/SrijanCherupally/SrijanCherupally/output/github-contribution-grid-snake-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/SrijanCherupally/SrijanCherupally/output/github-contribution-grid-snake.svg">
+  <img alt="github contribution grid snake animation" src="https://raw.githubusercontent.com/SrijanCherupally/SrijanCherupally/output/github-contribution-grid-snake.svg">
 </picture>
