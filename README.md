@@ -1,23 +1,12 @@
-# Hey, I'm Srijan 👋
+# hey, i'm srijan 👋
 
-I build software for rockets and the systems around them. Most of what I make sits somewhere between code, sensors, and the question: “will this still work when the rocket is moving fast?”
+I build things for rockets. Mostly C++, TypeScript, sensors, and flight software.
 
-Right now, I’m focused on TARC projects, especially flight software, altitude prediction, and airbrake control.
+- [Airbrakes V3](https://github.com/SrijanCherupally/Airbrakes-V3)
+- [rocketPredictor](https://github.com/SrijanCherupally/rocketPredictor)
 
-## What I’m working on
-
-- [Airbrakes V3](https://github.com/SrijanCherupally/Airbrakes-V3) — software for my TARC airbrakes project for the 2026–27 season, written in C++.
-- [rocketPredictor](https://github.com/SrijanCherupally/rocketPredictor) — a TypeScript tool for predicting TARC rocket altitude.
-- Building and testing things that use real sensor data, not just ideal inputs.
-
-## Tools I reach for
-
-C++ · TypeScript · Embedded systems · Sensors · GitHub
-
-## GitHub activity
-
-- [Contribution graph and recent activity](https://github.com/SrijanCherupally)
-- [Public repositories](https://github.com/SrijanCherupally?tab=repositories)
-- [Starred projects](https://github.com/SrijanCherupally?tab=stars)
-
-Thanks for stopping by.
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/SrijanCherupally/SrijanCherupally/output/github-contribution-grid-snake-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/SrijanCherupally/SrijanCherupally/output/github-contribution-grid-snake.svg">
+  <img alt="github contribution grid snake animation" src="https://raw.githubusercontent.com/SrijanCherupally/SrijanCherupally/output/github-contribution-grid-snake.svg">
+</picture>
